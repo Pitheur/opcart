@@ -1,0 +1,133 @@
+<?php
+/**
+ * User: pit
+ * Date: 14/05/15
+ * Time: 00:51
+ */
+
+class ModelShippingEnvoimoinscher extends Model
+{
+    function getQuote($address)
+    {
+        $this->load->language('shipping/envoimoinscher');
+        error_reporting(E_ALL);
+        ini_set("display_errors", 1);
+
+        require_once('/var/www/html/librairie/utils/autoload.php');
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get('envoimoinscher_geo_zone_id') . "' AND country_id = '" . (int)$address['country_id'] . "' AND (zone_id = '" . (int)$address['zone_id'] . "' OR zone_id = '0')");
+
+        if (!$this->config->get('envoimoinscher_geo_zone_id')) {
+            $status = true;
+        } elseif ($query->num_rows) {
+            $status = true;
+        } else {
+            $status = false;
+        }
+
+        $method_data = array();
+
+        if ($status) {
+            $weight = $this->weight->convert($this->cart->getWeight(), $this->config->get('config_weight_class_id'), $this->config->get('envoimoinscher_weight_class_id'));
+            $weight_code = strtoupper($this->weight->getUnit($this->config->get('envoimoinscher_weight_class_id')));
+
+            if ($weight_code == 'KG') {
+                $weight_code = 'KGS';
+            } elseif ($weight_code == 'LB') {
+                $weight_code = 'LBS';
+            }
+
+            $weight = ($weight < 0.1 ? 0.1 : $weight);
+
+            $length = $this->length->convert($this->config->get('envoimoinscher_length'), $this->config->get('config_length_class_id'), $this->config->get('envoimoinscher_length_class_id'));
+            $width = $this->length->convert($this->config->get('envoimoinscher_width'), $this->config->get('config_length_class_id'), $this->config->get('envoimoinscher_length_class_id'));
+            $height = $this->length->convert($this->config->get('envoimoinscher_height'), $this->config->get('config_length_class_id'), $this->config->get('envoimoinscher_length_class_id'));
+
+            $length_code = strtoupper($this->length->getUnit($this->config->get('envoimoinscher_length_class_id')));
+// Précision de l'expéditeur et du destinataire
+
+        $to = array(
+            "pays" => $address['iso_code_2'],
+            "code_postal" => $address['postcode'],
+            "ville" => $address['city'],
+            "type" => "particulier",
+            "adresse" => $address['address_1']
+        );
+        $from = array(
+            "pays" => $this->config->get('envoimoinscher_country'),
+            "code_postal" => $this->config->get('envoimoinscher_postcode'),
+            "ville" => $this->config->get('envoimoinscher_city'),
+            "type" => $this->config->get('envoimoinscher_quote_type'),
+            "adresse" => $this->config->get('envoimoinscher_address'));
+
+// Informations sur la cotation (date d'enlèvement, le délai, le code de contenu)
+        $quotInfo = array("collecte" => date("Y-m-d"), "delai" => "aucun",
+            "code_contenu" => 10120);
+
+// Initialisation de la classe
+        $cotCl = new Env_Quotation(array("user" => $this->config->get('envoimoinscher_username'), "pass" => $this->config->get('envoimoinscher_password'), "key" => $this->config->get('envoimoinscher_key')));
+
+// Initialisation de l'expéditeur et du destinataire
+        $cotCl->setPerson("expediteur", $from);
+        $cotCl->setPerson("destinataire", $to);
+
+// Précision de l'environnement de travail test ou prod
+        $cotCl->setEnv('test');
+
+// Initialisation du type d'envoi
+        $cotCl->setType(
+            "colis",
+            array(
+                1 => array(
+                    "poids" => $weight,
+                    "longueur" => $length,
+                    "largeur" => $width,
+                    "hauteur" => $height
+                )
+            )
+        );
+
+        $cotCl->getQuotation($quotInfo);
+// Si pas d'erreur CURL
+         /*if (!$cotCl->curlError) {
+             $ListError = $cotCl->respErrorsList;}*/
+
+
+// Si pas d'erreurs de la requête, on affiche le résultat
+        if (!$cotCl->respError) {
+            $cotCl->getOffers(false);
+        }
+        $quote_data=$cotCl->offers;
+
+        foreach ($cotCl->offers as $o => $offre) {
+            //$code = $offre['operator']['code'];
+            $label = $offre['service']['label'];
+            $logo = $offre['operator']['logo'];
+            $currency = $offre['price']['currency'];
+            $cost = $offre['price']['tax-inclusive'];
+            $tax_class_id = $this->config->get('envoimoinscher_tax_class_id');
+            $text = $this->currency->format($this->tax->calculate($this->currency->convert($cost, $currency, $this->currency->getCode()), $this->config->get('envoimoinscher_tax_class_id'), $this->config->get('config_tax')), $this->currency->getCode(), 1.0000000);
+
+            $quote_data[$o]= array(
+                'code'         => 'envoimoinscher.'.$o,
+                'title'        => $label,
+                'logo'         => $logo,
+                'cost'         => $this->currency->convert($cost, $currency, $this->config->get('config_currency')),
+                'tax_class_id' =>$tax_class_id,
+                'text'         =>$text
+            );
+        }
+        $title = $this->language->get('text_title');
+
+        $method_data = array(
+            'code'       => 'envoimoinscher',
+            'title'      => $title,
+            'quote'      => $quote_data,
+            'sort_order' => $this->config->get('envoimoinscher_sort_order'),
+            'error'      => $cotCl->respErrorsList
+        );
+        }var_dump($method_data);
+                return $method_data;
+    }
+}
+
+?>
