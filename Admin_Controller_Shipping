@@ -48,6 +48,7 @@ class ControllerShippingEnvoimoinscher extends Controller {
 		$this->data['text_today_intercity'] = $this->language->get('text_today_intercity');
 		$this->data['text_today_express'] = $this->language->get('text_today_express');
 		$this->data['text_today_express_saver'] = $this->language->get('text_today_express_saver');
+
 		
 		
 		$this->data['text_choixpaysenvoi'] = $this->language->get('text_choixpaysenvoi');
@@ -78,7 +79,8 @@ class ControllerShippingEnvoimoinscher extends Controller {
 		$this->data['entry_emc_cat'] = $this->language->get('entry_emc_cat');
 		$this->data['entry_typeemballage'] = $this->language->get('entry_typeemballage');
 		$this->data['entry_enlevement'] = $this->language->get('entry_enlevement');
-		
+        $this->data['entry_carriers_list'] = $this->language->get('entry_carrier_list');
+
 		
 		$this->data['entry_pickup'] = $this->language->get('entry_pickup');
 		$this->data['entry_packaging'] = $this->language->get('entry_packaging');
@@ -596,6 +598,15 @@ class ControllerShippingEnvoimoinscher extends Controller {
 		} else {
 			$this->data['envoimoinscher_emc_cat_id'] = $this->config->get('envoimoinscher_emc_cat_id');
 		}
+
+        //Récupération de la liste des transporteurs
+        $this->data['emc_carriers'] = $this->model_localisation_emc->getCarriersList();
+
+        if (isset($this->request->post['envoimoinscher_carrier_id'])) {
+            $this->data['envoimoinscher_carrier_id'] = $this->request->post['envoimoinscher_carrier_id'];
+        } else {
+            $this->data['envoimoinscher_carrier_id'] = $this->config->get('envoimoinscher_carrier_id');
+        }
 
 		// Récupération des catégories et sous catégories depuis l'API d'EMC
 		$this->data['emc_cates'] = $this->model_localisation_emc->getEmcCategoriesFromApi();
