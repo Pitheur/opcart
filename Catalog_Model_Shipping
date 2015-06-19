@@ -55,7 +55,7 @@ class ModelShippingEnvoimoinscher extends Model
             "type" => $this->config->get('envoimoinscher_type'),
             "adresse" => $this->config->get('envoimoinscher_adresse'));
 
-            var_dump($from);
+            
 // Informations sur la cotation (date d'enlèvement, le délai, le code de contenu)
         $quotInfo = array("collecte" => date("Y-m-d"), "delai" => "aucun",
             "code_contenu" => 10120);
@@ -82,7 +82,7 @@ class ModelShippingEnvoimoinscher extends Model
                 )
             )
         );
-var_dump($length);
+
         $cotCl->getQuotation($quotInfo);
 // Si pas d'erreur CURL
          /*if (!$cotCl->curlError) {
@@ -122,7 +122,7 @@ var_dump($length);
             'sort_order' => $this->config->get('envoimoinscher_sort_order'),
             'error'      => $cotCl->respErrorsList
         );
-        }var_dump($method_data);
+        }
                 return $method_data;
     }
 }
