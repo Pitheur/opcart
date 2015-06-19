@@ -1,0 +1,471 @@
+<?php echo $header; ?>
+<div id="content">
+  <div class="breadcrumb">
+    <?php foreach ($breadcrumbs as $breadcrumb) { ?>
+    <?php echo $breadcrumb['separator']; ?><a href="<?php echo $breadcrumb['href']; ?>"><?php echo $breadcrumb['text']; ?></a>
+    <?php } ?>
+  </div>
+  <?php if ($error_warning) { ?>
+  <div class="warning"><?php echo $error_warning; ?></div>
+  <?php } ?>
+  <div class="box">
+    <div class="heading">
+      <h1><img src="view/image/shipping.png" alt="" /> <?php echo $heading_title; ?></h1>
+      <div class="buttons"><a onclick="$('#form').submit();" class="button"><?php echo $button_save; ?></a><a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a></div>
+    </div>
+    <div class="content">
+      <div class="vtabs"><a href="#tab-presentation"><?php echo $tab_presentation; ?></a><a href="#tab-compte-marchand"><?php echo $tab_compte_marchand; ?></a><a href="#tab-description-des-envois"><?php echo $tab_description_des_envois; ?></a><a href="#tab-parametres"><?php echo $tab_parametres; ?></a><a href="#tab-transporteurs-simples"><?php echo $tab_transporteurs_simples; ?></a><a href="#tab-transporteurs-avances"><?php echo $tab_transporteurs_avances; ?></a><a href="#tab-simulateur-d-offres"><?php echo $tab_simulateur_d_offres; ?></a><a href="#tab-aide"><?php echo $tab_aide; ?></a></div>
+      <form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form">
+        <div id="tab-presentation" class="vtabs-content">
+          <table class="form">
+            <tr>
+              <td><?php echo $entry_display_insurance; ?></td>
+              <td><?php if ($royal_mail_display_insurance) { ?>
+                <input type="radio" name="royal_mail_display_insurance" value="1" checked="checked" />
+                <?php echo $text_yes; ?>
+                <input type="radio" name="royal_mail_display_insurance" value="0" />
+                <?php echo $text_no; ?>
+                <?php } else { ?>
+                <input type="radio" name="royal_mail_display_insurance" value="1" />
+                <?php echo $text_yes; ?>
+                <input type="radio" name="royal_mail_display_insurance" value="0" checked="checked" />
+                <?php echo $text_no; ?>
+                <?php } ?></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_weight_class; ?></td>
+              <td><select name="royal_mail_weight_class_id">
+                  <?php foreach ($weight_classes as $weight_class) { ?>
+                  <?php if ($weight_class['weight_class_id'] == $royal_mail_weight_class_id) { ?>
+                  <option value="<?php echo $weight_class['weight_class_id']; ?>" selected="selected"><?php echo $weight_class['title']; ?></option>
+                  <?php } else { ?>
+                  <option value="<?php echo $weight_class['weight_class_id']; ?>"><?php echo $weight_class['title']; ?></option>
+                  <?php } ?>
+                  <?php } ?>
+                </select></td>
+            </tr>
+
+            <tr>
+              <td><?php echo $entry_geo_zone; ?></td>
+              <td><select name="royal_mail_geo_zone_id">
+                  <option value="0"><?php echo $text_all_zones; ?></option>
+                  <?php foreach ($geo_zones as $geo_zone) { ?>
+                  <?php if ($geo_zone['geo_zone_id'] == $royal_mail_geo_zone_id) { ?>
+                  <option value="<?php echo $geo_zone['geo_zone_id']; ?>" selected="selected"><?php echo $geo_zone['name']; ?></option>
+                  <?php } else { ?>
+                  <option value="<?php echo $geo_zone['geo_zone_id']; ?>"><?php echo $geo_zone['name']; ?></option>
+                  <?php } ?>
+                  <?php } ?>
+                </select></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_status; ?></td>
+              <td><select name="royal_mail_status">
+                  <?php if ($royal_mail_status) { ?>
+                  <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+                  <option value="0"><?php echo $text_disabled; ?></option>
+                  <?php } else { ?>
+                  <option value="1"><?php echo $text_enabled; ?></option>
+                  <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
+                  <?php } ?>
+                </select></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_sort_order; ?></td>
+              <td><input type="text" name="royal_mail_sort_order" value="<?php echo $royal_mail_sort_order; ?>" size="1" /></td>
+            </tr>
+          </table>
+        </div>
+        <div id="tab-compte-marchand" class="vtabs-content">
+          <table class="form">
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_login; ?></td>
+              <td><input type="text" name="envoimoinscher_login" value="<?php echo $envoimoinscher_login; ?>" />
+                <?php if ($error_login) { ?>
+                <span class="error"><?php echo $error_login; ?></span>
+                <?php } ?></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_pass; ?></td>
+              <td><input type="text" name="envoimoinscher_pass" value="<?php echo $envoimoinscher_pass; ?>" />
+                <?php if ($error_pass) { ?>
+                <span class="error"><?php echo $error_pass; ?></span>
+                <?php } ?></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_cle; ?></td>
+              <td><input type="text" name="envoimoinscher_cle" value="<?php echo $envoimoinscher_cle; ?>" />
+                <?php if ($error_cle) { ?>
+                <span class="error"><?php echo $error_cle; ?></span>
+                <?php } ?></td>
+              <td><a href="http://ecommerce.envoimoinscher.com/" class="action_module" target="_blank">Cliquez ici pour obtenir votre clé API</a></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_environnement; ?></td>
+              <td><select name="envoimoinscher_environnement">
+                  <?php foreach ($environnementtenvoimoinscher as $environnement) { ?>
+                  <?php if ($environnement['value'] == $envoimoinscher_environnement) { ?>
+                  <option value="<?php echo $environnement['value']; ?>" selected="selected"><?php echo $environnement['text']; ?></option>
+                  <?php } else { ?>
+                  <option value="<?php echo $environnement['value']; ?>"><?php echo $environnement['text']; ?></option>
+                  <?php } ?>
+                  <?php } ?>
+                </select></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_civilite; ?></td>
+              <td><select name="envoimoinscher_civilite">
+                  <?php foreach ($civilenvoimoinscher as $civilite) { ?>
+                  <?php if ($civilite['value'] == $envoimoinscher_civilite) { ?>
+                  <option value="<?php echo $civilite['value']; ?>" selected="selected"><?php echo $civilite['text']; ?></option>
+                  <?php } else { ?>
+                  <option value="<?php echo $civilite['value']; ?>"><?php echo $civilite['text']; ?></option>
+                  <?php } ?>
+                  <?php } ?>
+                </select></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_prenom; ?></td>
+              <td><input type="text" name="envoimoinscher_prenom" value="<?php echo $envoimoinscher_prenom; ?>" />
+                <?php if ($error_prenom) { ?>
+                <span class="error"><?php echo $error_prenom; ?></span>
+                <?php } ?></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_nom; ?></td>
+              <td><input type="text" name="envoimoinscher_nom" value="<?php echo $envoimoinscher_nom; ?>" />
+                <?php if ($error_nom) { ?>
+                <span class="error"><?php echo $error_nom; ?></span>
+                <?php } ?></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_type; ?></td>
+              <td><select name="envoimoinscher_type">
+                  <?php foreach ($typeenvoimoinscher as $type) { ?>
+                  <?php if ($type['value'] == $envoimoinscher_type) { ?>
+                  <option value="<?php echo $type['value']; ?>" selected="selected"><?php echo $type['text']; ?></option>
+                  <?php } else { ?>
+                  <option value="<?php echo $type['value']; ?>"><?php echo $type['text']; ?></option>
+                  <?php } ?>
+                  <?php } ?>
+                </select></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_societe; ?></td>
+              <td><input type="text" name="envoimoinscher_societe" value="<?php echo $envoimoinscher_societe; ?>" /></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_adresse; ?></td>
+              <td><input type="text" name="envoimoinscher_adresse" value="<?php echo $envoimoinscher_adresse; ?>" /></td>
+                <?php if ($error_adresse) { ?>
+                <span class="error"><?php echo $error_adresse; ?></span>
+                <?php } ?></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_codepostal; ?></td>
+              <td><input type="text" name="envoimoinscher_codepostal" value="<?php echo $envoimoinscher_codepostal; ?>"  />
+                <?php if ($error_codepostal) { ?>
+                <span class="error"><?php echo $error_codepostal; ?></span>
+                <?php } ?></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_ville; ?></td>
+              <td><input type="text" name="envoimoinscher_ville" value="<?php echo $envoimoinscher_ville; ?>" />
+                <?php if ($error_ville) { ?>
+                <span class="error"><?php echo $error_ville; ?></span>
+                <?php } ?></td>
+            </tr>
+            <tr>
+            <td><span class="required">*</span> <?php echo $entry_emc_pays; ?></td>
+            <td><select name="envoimoinscher_emc_pays_id">
+                <option value="0"><?php echo $text_choixpaysenvoi; ?></option>
+                <?php foreach ($emc_payss as $emc_pays) { ?>
+                <?php if ($emc_pays['emc_pays_id'] == $envoimoinscher_emc_pays_id) { ?>
+                <option value="<?php echo $emc_pays['emc_pays_id']; ?>" selected="selected"><?php echo $emc_pays['title']; ?></option>
+                <?php } else { ?>
+                <option value="<?php echo $emc_pays['emc_pays_id']; ?>"><?php echo $emc_pays['title']; ?></option>
+                <?php } ?>
+                <?php } ?>
+              </select></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_telephone; ?></td>
+              <td><input type="text" name="envoimoinscher_telephone" value="<?php echo $envoimoinscher_telephone; ?>" />
+                <?php if ($error_telephone) { ?>
+                <span class="error"><?php echo $error_telephone; ?></span>
+                <?php } ?></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_mail; ?></td>
+              <td><input type="text" name="envoimoinscher_mail" value="<?php echo $envoimoinscher_mail; ?>" />
+                <?php if ($error_mail) { ?>
+                <span class="error"><?php echo $error_mail; ?></span>
+                <?php } ?></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_supadresse; ?></td>
+              <td><textarea name="envoimoinscher_supaddress" cols="40" rows="5"><?php echo $envoimoinscher_supadresse; ?></textarea></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_debutdispo; ?></td>
+              <td><select name="envoimoinscher_debutdispo">
+                  <?php foreach ($debutdispenvoimoinscher as $debutdispo) { ?>
+                  <?php if ($debutdispo['value'] == $envoimoinscher_debutdispo) { ?>
+                  <option value="<?php echo $debutdispo['value']; ?>" selected="selected"><?php echo $debutdispo['text']; ?></option>
+                  <?php } else { ?>
+                  <option value="<?php echo $debutdispo['value']; ?>"><?php echo $debutdispo['text']; ?></option>
+                  <?php } ?>
+                  <?php } ?>
+                </select></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_findispo; ?></td>
+              <td><select name="envoimoinscher_findispo">
+                  <?php foreach ($findispenvoimoinscher as $findispo) { ?>
+                  <?php if ($findispo['value'] == $envoimoinscher_findispo) { ?>
+                  <option value="<?php echo $findispo['value']; ?>" selected="selected"><?php echo $findispo['text']; ?></option>
+                  <?php } else { ?>
+                  <option value="<?php echo $findispo['value']; ?>"><?php echo $findispo['text']; ?></option>
+                  <?php } ?>
+                  <?php } ?>
+                </select></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_status; ?></td>
+              <td><select name="envoimoinscher_status">
+                  <?php if ($envoimoinscher_status) { ?>
+                  <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+                  <option value="0"><?php echo $text_disabled; ?></option>
+                  <?php } else { ?>
+                  <option value="1"><?php echo $text_enabled; ?></option>
+                  <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
+                  <?php } ?>
+                </select></td>
+            </tr>
+          </table>
+        </div>
+        <div id="tab-description-des-envois" class="vtabs-content">
+          <table class="form">
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_typeenvoi; ?></td>
+              <td><select name="envoimoinscher_typeenvoi">
+                  <option value="0"><?php echo $text_choixtypenvoi; ?></option>
+                  <?php foreach ($typenvoienvoimoinscher as $typeenvoi) { ?>
+                  <?php if ($typeenvoi['value'] == $envoimoinscher_typeenvoi) { ?>
+                  <option value="<?php echo $typeenvoi['value']; ?>" selected="selected"><?php echo $typeenvoi['text']; ?></option>
+                  <?php } else { ?>
+                  <option value="<?php echo $typeenvoi['value']; ?>"><?php echo $typeenvoi['text']; ?></option>
+                  <?php } ?>
+                  <?php } ?>
+                </select></td>
+            </tr>
+            <tr>
+            <td><span class="required">*</span> <?php echo $entry_emc_cat; ?></td>
+            <td><select name="envoimoinscher_emc_cat_id">
+                <option value="0"><?php echo $text_choixcatenvoi; ?></option>
+                <?php foreach ($emc_cates as $emc_cat) { ?>
+                <?php if ($emc_cat['emc_cat_id'] == $envoimoinscher_emc_cat_id) { ?>
+                <option value="<?php echo $emc_cat['emc_cat_id']; ?>" selected="selected"><?php echo $emc_cat['title']; ?></option>
+                <?php } else { ?>
+                <option value="<?php echo $emc_cat['emc_cat_id']; ?>"><?php echo $emc_cat['title']; ?></option>
+                <?php } ?>
+                <?php } ?>
+              </select></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_typeemballage; ?></td>
+              <td><select name="envoimoinscher_typeemballage">
+                  <option value="0"><?php echo $text_choixtypeemballage; ?></option>
+                  <?php foreach ($typemballageenvoimoinscher as $typeemballage) { ?>
+                  <?php if ($typeemballage['value'] == $envoimoinscher_typeemballage) { ?>
+                  <option value="<?php echo $typeemballage['value']; ?>" selected="selected"><?php echo $typeemballage['text']; ?></option>
+                  <?php } else { ?>
+                  <option value="<?php echo $typeemballage['value']; ?>"><?php echo $typeemballage['text']; ?></option>
+                  <?php } ?>
+                  <?php } ?>
+                </select></td>
+            </tr>
+            <tr>
+              <td><span class="required">*</span> <?php echo $entry_enlevement; ?></td>
+              <td><select name="envoimoinscher_enlevement">
+                  <?php foreach ($enlevementtenvoimoinscher as $enlevement) { ?>
+                  <?php if ($enlevement['value'] == $envoimoinscher_enlevement) { ?>
+                  <option value="<?php echo $enlevement['value']; ?>" selected="selected"><?php echo $enlevement['text']; ?></option>
+                  <?php } else { ?>
+                  <option value="<?php echo $enlevement['value']; ?>"><?php echo $enlevement['text']; ?></option>
+                  <?php } ?>
+                  <?php } ?>
+                </select></td>
+            </tr>
+              <tr>
+                  <td><?php echo $entry_weight_class; ?></td>
+                  <td><select name="envoimoinscher_weight_class_id">
+                          <?php foreach ($weight_classes as $weight_class) { ?>
+                          <?php if ($weight_class['weight_class_id'] == $envoimoinscher_weight_class_id) { ?>
+                          <option value="<?php echo $weight_class['weight_class_id']; ?>" selected="selected"><?php echo $weight_class['title']; ?></option>
+                          <?php } else { ?>
+                          <option value="<?php echo $weight_class['weight_class_id']; ?>"><?php echo $weight_class['title']; ?></option>
+                          <?php } ?>
+                          <?php } ?>
+                      </select></td>
+              </tr>
+              <tr>
+                  <td><?php echo $entry_length_class; ?></td>
+                  <td><select name="envoimoinscher_length_class_id">
+                          <?php foreach ($length_classes as $length_class) { ?>
+                          <?php if ($length_class['length_class_id'] == $envoimoinscher_length_class_id) { ?>
+                          <option value="<?php echo $length_class['length_class_id']; ?>" selected="selected"><?php echo $length_class['title']; ?></option>
+                          <?php } else { ?>
+                          <option value="<?php echo $length_class['length_class_id']; ?>"><?php echo $length_class['title']; ?></option>
+                          <?php } ?>
+                          <?php } ?>
+                      </select></td>
+              </tr>
+              <tr>
+                  <td><span class="required">*</span> <?php echo $entry_dimension; ?></td>
+                  <td><input type="text" name="envoimoinscher_length" value="<?php echo $envoimoinscher_length; ?>" size="4" />
+                      <input type="text" name="envoimoinscher_width" value="<?php echo $envoimoinscher_width; ?>" size="4" />
+                      <input type="text" name="envoimoinscher_height" value="<?php echo $envoimoinscher_height; ?>" size="4" /></td>
+                  <?php if ($error_dimension) { ?>
+                  <span class="error"><?php echo $error_dimension; ?></span>
+                  <?php } ?></td>
+              </tr>
+              <tr>
+                  <td><?php echo $entry_tax_class; ?></td>
+                  <td><select name="envoimoinscher_tax_class_id">
+                          <option value="0"><?php echo $text_none; ?></option>
+                          <?php foreach ($tax_classes as $tax_class) { ?>
+                          <?php if ($tax_class['tax_class_id'] == $envoimoinscher_tax_class_id) { ?>
+                          <option value="<?php echo $tax_class['tax_class_id']; ?>" selected="selected"><?php echo $tax_class['title']; ?></option>
+                          <?php } else { ?>
+                          <option value="<?php echo $tax_class['tax_class_id']; ?>"><?php echo $tax_class['title']; ?></option>
+                          <?php } ?>
+                          <?php } ?>
+                      </select></td>
+              </tr>
+          </table>
+        </div>
+        <div id="tab-parametres" class="vtabs-content">
+          <table class="form">
+            <tr>
+              <td><?php echo $entry_rate; ?></td>
+              <td><textarea name="royal_mail_2nd_class_standard_rate" cols="40" rows="5"><?php echo $royal_mail_2nd_class_standard_rate; ?></textarea></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_status; ?></td>
+              <td><select name="royal_mail_2nd_class_standard_status">
+                  <?php if ($royal_mail_2nd_class_standard_status) { ?>
+                  <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+                  <option value="0"><?php echo $text_disabled; ?></option>
+                  <?php } else { ?>
+                  <option value="1"><?php echo $text_enabled; ?></option>
+                  <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
+                  <?php } ?>
+                </select></td>
+            </tr>
+          </table>
+        </div>
+        <div id="tab-transporteurs-simples" class="vtabs-content">
+          <table class="form">
+            <tr>
+              <td><?php echo $entry_rate; ?></td>
+              <td><textarea name="royal_mail_2nd_class_recorded_rate" cols="40" rows="5"><?php echo $royal_mail_2nd_class_recorded_rate; ?></textarea></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_insurance; ?></td>
+              <td><textarea name="royal_mail_2nd_class_recorded_insurance" cols="40" rows="5"><?php echo $royal_mail_2nd_class_recorded_insurance; ?></textarea></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_status; ?></td>
+              <td><select name="royal_mail_2nd_class_recorded_status">
+                  <?php if ($royal_mail_2nd_class_recorded_status) { ?>
+                  <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+                  <option value="0"><?php echo $text_disabled; ?></option>
+                  <?php } else { ?>
+                  <option value="1"><?php echo $text_enabled; ?></option>
+                  <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
+                  <?php } ?>
+                </select></td>
+            </tr>
+          </table>
+        </div>
+        <div id="tab-transporteurs-avances" class="vtabs-content">
+          <table class="form">
+            <tr>
+              <td><?php echo $entry_rate; ?></td>
+              <td><textarea name="royal_mail_special_delivery_500_rate" cols="40" rows="5"><?php echo $royal_mail_special_delivery_500_rate; ?></textarea></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_insurance; ?></td>
+              <td><textarea name="royal_mail_special_delivery_500_insurance" cols="40" rows="5"><?php echo $royal_mail_special_delivery_500_insurance; ?></textarea></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_status; ?></td>
+              <td><select name="royal_mail_special_delivery_500_status">
+                  <?php if ($royal_mail_special_delivery_500_status) { ?>
+                  <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+                  <option value="0"><?php echo $text_disabled; ?></option>
+                  <?php } else { ?>
+                  <option value="1"><?php echo $text_enabled; ?></option>
+                  <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
+                  <?php } ?>
+                </select></td>
+            </tr>
+          </table>
+        </div>
+        <div id="tab-simulateur-d-offres" class="vtabs-content">
+          <table class="form">
+            <tr>
+              <td><?php echo $entry_rate; ?></td>
+              <td><textarea name="royal_mail_special_delivery_1000_rate" cols="40" rows="5"><?php echo $royal_mail_special_delivery_1000_rate; ?></textarea></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_insurance; ?></td>
+              <td><textarea name="royal_mail_special_delivery_1000_insurance" cols="40" rows="5"><?php echo $royal_mail_special_delivery_1000_insurance; ?></textarea></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_status; ?></td>
+              <td><select name="royal_mail_special_delivery_1000_status">
+                  <?php if ($royal_mail_special_delivery_1000_status) { ?>
+                  <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+                  <option value="0"><?php echo $text_disabled; ?></option>
+                  <?php } else { ?>
+                  <option value="1"><?php echo $text_enabled; ?></option>
+                  <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
+                  <?php } ?>
+                </select></td>
+            </tr>
+          </table>
+        </div>
+        <div id="tab-aide" class="vtabs-content">
+          <table class="form">
+            <tr>
+              <td><?php echo $entry_rate; ?></td>
+              <td><textarea name="royal_mail_special_delivery_2500_rate" cols="40" rows="5"><?php echo $royal_mail_special_delivery_2500_rate; ?></textarea></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_insurance; ?></td>
+              <td><textarea name="royal_mail_special_delivery_2500_insurance" cols="40" rows="5"><?php echo $royal_mail_special_delivery_2500_insurance; ?></textarea></td>
+            </tr>
+            <tr>
+              <td><?php echo $entry_status; ?></td>
+              <td><select name="royal_mail_special_delivery_2500_status">
+                  <?php if ($royal_mail_special_delivery_2500_status) { ?>
+                  <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+                  <option value="0"><?php echo $text_disabled; ?></option>
+                  <?php } else { ?>
+                  <option value="1"><?php echo $text_enabled; ?></option>
+                  <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
+                  <?php } ?>
+                </select></td>
+            </tr>
+          </table>
+        </div> 
+      </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('.vtabs a').tabs();
+//--></script> 
+<?php echo $footer; ?> 
