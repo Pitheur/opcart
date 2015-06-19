@@ -1,0 +1,203 @@
+<?php
+
+require_once('../system/library/emc/utils/header.php');
+error_reporting(E_ERROR | E_WARNING | E_PARSE); 
+require_once('../system/library/emc/utils/autoload.php');
+
+class ModelLocalisationEmc extends Model {
+	
+
+	public function getEmcCat($emc_cat_id) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "emc_cat WHERE emc_cat_id = '" . (int)$emc_cat_id . "'");
+
+		return $query->row;
+	}
+
+	public function getEmcCategories($data = array()) {
+		if ($data) {
+			$sql = "SELECT * FROM " . DB_PREFIX . "emc_cat";
+
+			$sql .= " ORDER BY title";	
+
+			if (isset($data['order']) && ($data['order'] == 'DESC')) {
+				$sql .= " DESC";
+			} else {
+				$sql .= " ASC";
+			}
+
+			if (isset($data['start']) || isset($data['limit'])) {
+				if ($data['start'] < 0) {
+					$data['start'] = 0;
+				}					
+
+				if ($data['limit'] < 1) {
+					$data['limit'] = 20;
+				}	
+
+				$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+			}
+
+			$query = $this->db->query($sql);
+
+			return $query->rows;		
+		} else {
+			$emc_cat_data = $this->cache->get('emc_cat');
+
+			if (!$emc_cat_data) {
+				$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "emc_cat");
+
+				$emc_cat_data = $query->rows;
+
+				$this->cache->set('emc_cat', $emc_cat_data);
+			}
+
+			return $emc_cat_data;			
+		}
+	}
+	public function getEmcCategoriesFromApi($data = array()) {
+		
+		
+		$categoriesStyle = 'style="font-weight:bolder;"';
+		// Initialisation de la classe chargée de récupérer les catégories 
+		$contentCl = new Env_ContentCategory(array("user" => $this->config->get('envoimoinscher_login'), "pass" => $this->config->get('envoimoinscher_pass'), "key" => $this->config->get('envoimoinscher_cle')));
+		
+		//var_dump($this->config->get('envoimoinscher_login'), $this->config->get('envoimoinscher_pass'), $this->config->get('envoimoinscher_cle'));
+		//var_dump($contentCl);
+		
+		
+		// Cette méthode permet de récupérer la liste des catégories
+		$contentCl->getCategories();
+		
+		//die();
+		
+		// Celle-ci charge la liste des catégories de contenus (sous-catégories)
+		$contentCl->getContents(); 
+		
+		//var_dump($contentCl->categories);
+		
+		// Grâce à cette méthode vous pouvez récupérer les sous-catégories d'une seule catégorie
+		//$child = $contentCl->getChild(10000); // en paramètre l'identifiant de la catégorie
+		
+		// Pour créer un select automatiquement, il faut retourner les catégories avec la même forme
+		// que la fonction getEmcCategories au dessus
+		
+		$tableauRetourCategories = array();
+
+		
+		foreach ($contentCl->categories as $codeCategorieParente => $categorie)
+		{
+			$nvlleCategorieParente = array(
+				"emc_cat_id" => $categorie["code"],
+				"emc_categories_id_eca" => $codeCategorieParente,
+				"title" => $categorie["label"]
+			);
+			
+			// On ajoute la nvlle catégorie parente au tableau que l'on retourne
+			$tableauRetourCategories[] = $nvlleCategorieParente;
+			if (isset($contentCl->contents[$codeCategorieParente] )) {
+					  
+				foreach ($contentCl->contents[$codeCategorieParente] as $codeSousCategorie => $sousCategorie)
+				{
+					$nvlleSousCategorie = array(
+						"emc_cat_id" => $sousCategorie["code"],
+						"emc_categories_id_eca" => $codeCategorieParente,
+						"title" => $sousCategorie["label"]
+					);
+					
+					// On ajoute la nvlle sous catégorie au tableau que l'on retourne
+					$tableauRetourCategories[] = $nvlleSousCategorie;
+				}
+			}
+			
+		}
+		
+		
+		return $tableauRetourCategories;
+		
+		
+		
+	}
+	
+	
+	
+	public function getEmcPaysFromApi($data = array()) {
+		
+		
+		$categoriesStyle = 'style="font-weight:bolder;"';
+		// Initialisation de la classe chargée de récupérer les catégories 
+		$countryCl = new Env_Country(array("user" => $this->config->get('envoimoinscher_login'), "pass" => $this->config->get('envoimoinscher_pass'), "key" => $this->config->get('envoimoinscher_cle')));
+		
+		//var_dump($this->config->get('envoimoinscher_login'), $this->config->get('envoimoinscher_pass'), $this->config->get('envoimoinscher_cle'));
+		
+		
+		// Cette méthode permet de récupérer la liste des catégories des pays
+		$countryCl->getCountries();
+		//echo "<pre>".print_r ($countryCl, true) ."</pre>";
+		//echo "<pre>".print_r ($countryCl->countries, true) ."</pre>";
+		//die();
+		//die();
+		
+		// Celle-ci charge la liste des catégories de contenus (sous-catégories)
+		
+		
+		//var_dump($countryCl->countries);
+		//die();
+		
+		//var_dump($countryCl->country);
+		//die();
+		
+		// Grâce à cette méthode vous pouvez récupérer les sous-catégories d'une seule catégorie
+		//$child = $contentCl->getChild(10000); // en paramètre l'identifiant de la catégorie
+		
+		// Pour créer un select automatiquement, il faut retourner les catégories avec la même forme
+		// que la fonction getEmcCategories au dessus
+		
+		$tableauRetourPays = array();
+		
+		foreach ($countryCl->countries as $country)
+		{
+			$nvPays = array(
+				"emc_pays_id" => $country["code"],
+				"title" => $country["label"]
+			);
+			
+			// On ajoute la nvlle catégorie parente au tableau que l'on retourne
+			$tableauRetourPays[] = $nvPays;
+			
+		}
+		
+		return $tableauRetourPays;
+		
+		
+		
+	}
+
+    public function getCarriersList()
+    {
+
+        $lcCl = new Env_CarriersList(array("user" => $this->config->get('envoimoinscher_login'), "pass" => $this->config->get('envoimoinscher_pass'), "key" => $this->config->get('envoimoinscher_cle')));
+        $lcCl->setEnv($this->config->get('envoimoinscher_environnement'));
+
+        $lcCl->loadCarriersList("Opencart", "1.5.4");
+        $carrier_error = array();
+
+        if (!$lcCl->curlError && !$lcCl->respError) {
+
+            $carrierList = $lcCl->carriers;
+            return $carrierList;
+        }
+        elseif ($lcCl->respError) {
+
+            $carrier_error['ope_name'] = "La requête n'est pas valide : ";
+            foreach ($lcCl->respErrorsList as $m => $message) {
+                $carrier_error['description'] = $message['message'];
+            }
+            return $carrier_error;
+        }
+        else {
+            $carrier_error['description'] = "<b>Une erreur pendant l'envoi de la requête </b> : " . $lcCl->curlErrorText;
+        }
+    }
+	
+}
+?>
