@@ -1,9 +1,5 @@
 <?php
-/**
- * User: pit
- * Date: 14/05/15
- * Time: 00:51
- */
+
 
 class ModelShippingEnvoimoinscher extends Model
 {
@@ -13,7 +9,7 @@ class ModelShippingEnvoimoinscher extends Model
         error_reporting(E_ALL);
         ini_set("display_errors", 1);
 
-        require_once('/var/www/html/librairie/utils/autoload.php');
+        require_once('/var/www/html/system/library/emc/utils/autoload.php');
         $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get('envoimoinscher_geo_zone_id') . "' AND country_id = '" . (int)$address['country_id'] . "' AND (zone_id = '" . (int)$address['zone_id'] . "' OR zone_id = '0')");
 
         if (!$this->config->get('envoimoinscher_geo_zone_id')) {
@@ -53,18 +49,19 @@ class ModelShippingEnvoimoinscher extends Model
             "adresse" => $address['address_1']
         );
         $from = array(
-            "pays" => $this->config->get('envoimoinscher_country'),
-            "code_postal" => $this->config->get('envoimoinscher_postcode'),
-            "ville" => $this->config->get('envoimoinscher_city'),
-            "type" => $this->config->get('envoimoinscher_quote_type'),
-            "adresse" => $this->config->get('envoimoinscher_address'));
+            "pays" => $this->config->get('envoimoinscher_emc_pays_id'),
+            "code_postal" => $this->config->get('envoimoinscher_codepostal'),
+            "ville" => $this->config->get('envoimoinscher_ville'),
+            "type" => $this->config->get('envoimoinscher_type'),
+            "adresse" => $this->config->get('envoimoinscher_adresse'));
 
+            var_dump($from);
 // Informations sur la cotation (date d'enlèvement, le délai, le code de contenu)
         $quotInfo = array("collecte" => date("Y-m-d"), "delai" => "aucun",
             "code_contenu" => 10120);
 
 // Initialisation de la classe
-        $cotCl = new Env_Quotation(array("user" => $this->config->get('envoimoinscher_username'), "pass" => $this->config->get('envoimoinscher_password'), "key" => $this->config->get('envoimoinscher_key')));
+        $cotCl = new Env_Quotation(array("user" => $this->config->get('envoimoinscher_login'), "pass" => $this->config->get('envoimoinscher_pass'), "key" => $this->config->get('envoimoinscher_cle')));
 
 // Initialisation de l'expéditeur et du destinataire
         $cotCl->setPerson("expediteur", $from);
@@ -85,7 +82,7 @@ class ModelShippingEnvoimoinscher extends Model
                 )
             )
         );
-
+var_dump($length);
         $cotCl->getQuotation($quotInfo);
 // Si pas d'erreur CURL
          /*if (!$cotCl->curlError) {
@@ -131,3 +128,4 @@ class ModelShippingEnvoimoinscher extends Model
 }
 
 ?>
+
