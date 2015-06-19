@@ -1,0 +1,801 @@
+<?php
+class ControllerShippingEnvoimoinscher extends Controller {
+	private $error = array(); 
+
+	public function index() {
+		$this->language->load('shipping/envoimoinscher');
+
+		$this->document->setTitle($this->language->get('heading_title'));
+
+		$this->load->model('setting/setting');
+
+		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
+			$this->model_setting_setting->editSetting('envoimoinscher', $this->request->post);		
+
+			$this->session->data['success'] = $this->language->get('text_success');
+
+			$this->redirect($this->url->link('extension/shipping', 'token=' . $this->session->data['token'], 'SSL'));
+		}
+
+		$this->data['heading_title'] = $this->language->get('heading_title');
+
+		$this->data['text_enabled'] = $this->language->get('text_enabled');
+		$this->data['text_disabled'] = $this->language->get('text_disabled');
+		$this->data['text_yes'] = $this->language->get('text_yes');
+		$this->data['text_no'] = $this->language->get('text_no');		
+		$this->data['text_select_all'] = $this->language->get('text_select_all');
+		$this->data['text_unselect_all'] = $this->language->get('text_unselect_all');		
+		$this->data['text_all_zones'] = $this->language->get('text_all_zones');
+		$this->data['text_none'] = $this->language->get('text_none');
+		$this->data['text_next_day_air'] = $this->language->get('text_next_day_air');
+		$this->data['text_2nd_day_air'] = $this->language->get('text_2nd_day_air');
+		$this->data['text_ground'] = $this->language->get('text_ground');
+		$this->data['text_worldwide_express'] = $this->language->get('text_worldwide_express');
+		$this->data['text_worldwide_express_plus'] = $this->language->get('text_worldwide_express_plus');
+		$this->data['text_worldwide_expedited'] = $this->language->get('text_worldwide_expedited');
+		$this->data['text_express'] = $this->language->get('text_express');
+		$this->data['text_standard'] = $this->language->get('text_standard');
+		$this->data['text_3_day_select'] = $this->language->get('text_3_day_select');
+		$this->data['text_next_day_air_saver'] = $this->language->get('text_next_day_air_saver');
+		$this->data['text_next_day_air_early_am'] = $this->language->get('text_next_day_air_early_am');
+		$this->data['text_expedited'] = $this->language->get('text_expedited');
+		$this->data['text_2nd_day_air_am'] = $this->language->get('text_2nd_day_air_am');
+		$this->data['text_saver'] = $this->language->get('text_saver');
+		$this->data['text_express_early_am'] = $this->language->get('text_express_early_am');
+		$this->data['text_express_plus'] = $this->language->get('text_express_plus');
+		$this->data['text_today_standard'] = $this->language->get('text_today_standard');
+		$this->data['text_today_dedicated_courier'] = $this->language->get('text_today_dedicated_courier');
+		$this->data['text_today_intercity'] = $this->language->get('text_today_intercity');
+		$this->data['text_today_express'] = $this->language->get('text_today_express');
+		$this->data['text_today_express_saver'] = $this->language->get('text_today_express_saver');
+		
+		
+		$this->data['text_choixpaysenvoi'] = $this->language->get('text_choixpaysenvoi');
+		$this->data['text_choixtypenvoi'] = $this->language->get('text_choixtypenvoi');
+		$this->data['text_choixcatenvoi'] = $this->language->get('text_choixcatenvoi');
+		$this->data['text_choixtypeemballage'] = $this->language->get('text_choixtypeemballage');
+		
+		
+		$this->data['entry_login'] = $this->language->get('entry_login');
+		$this->data['entry_pass'] = $this->language->get('entry_pass');
+		$this->data['entry_cle'] = $this->language->get('entry_cle');
+		$this->data['entry_environnement'] = $this->language->get('entry_environnement');
+		$this->data['entry_civilite'] = $this->language->get('entry_civilite');
+		$this->data['entry_prenom'] = $this->language->get('entry_prenom');
+		$this->data['entry_nom'] = $this->language->get('entry_nom');
+		$this->data['entry_type'] = $this->language->get('entry_type');
+		$this->data['entry_societe'] = $this->language->get('entry_societe');
+		$this->data['entry_adresse'] = $this->language->get('entry_adresse');
+		$this->data['entry_codepostal'] = $this->language->get('entry_codepostal');
+		$this->data['entry_ville'] = $this->language->get('entry_ville');
+		$this->data['entry_emc_pays'] = $this->language->get('entry_emc_pays');
+		$this->data['entry_telephone'] = $this->language->get('entry_telephone');
+		$this->data['entry_mail'] = $this->language->get('entry_mail');
+		$this->data['entry_supadresse'] = $this->language->get('entry_supadresse');
+		$this->data['entry_debutdispo'] = $this->language->get('entry_debutdispo');
+		$this->data['entry_findispo'] = $this->language->get('entry_findispo');
+		$this->data['entry_typeenvoi'] = $this->language->get('entry_typeenvoi');
+		$this->data['entry_emc_cat'] = $this->language->get('entry_emc_cat');
+		$this->data['entry_typeemballage'] = $this->language->get('entry_typeemballage');
+		$this->data['entry_enlevement'] = $this->language->get('entry_enlevement');
+		
+		
+		$this->data['entry_pickup'] = $this->language->get('entry_pickup');
+		$this->data['entry_packaging'] = $this->language->get('entry_packaging');
+		$this->data['entry_classification'] = $this->language->get('entry_classification');
+		$this->data['entry_origin'] = $this->language->get('entry_origin');
+		$this->data['entry_city'] = $this->language->get('entry_city');
+		$this->data['entry_state'] = $this->language->get('entry_state');
+		$this->data['entry_country'] = $this->language->get('entry_country');
+		$this->data['entry_postcode'] = $this->language->get('entry_postcode');
+		$this->data['entry_test'] = $this->language->get('entry_test');
+		$this->data['entry_quote_type'] = $this->language->get('entry_quote_type');
+		$this->data['entry_service'] = $this->language->get('entry_service');
+		$this->data['entry_insurance'] = $this->language->get('entry_insurance');
+		$this->data['entry_display_weight'] = $this->language->get('entry_display_weight');
+		$this->data['entry_weight_class'] = $this->language->get('entry_weight_class');
+		$this->data['entry_length_code'] = $this->language->get('entry_length_code');
+		$this->data['entry_length_class'] = $this->language->get('entry_length_class');
+		$this->data['entry_dimension'] = $this->language->get('entry_dimension');
+		$this->data['entry_tax_class'] = $this->language->get('entry_tax_class');
+		$this->data['entry_geo_zone'] = $this->language->get('entry_geo_zone');
+		$this->data['entry_status'] = $this->language->get('entry_status');
+		$this->data['entry_sort_order'] = $this->language->get('entry_sort_order');
+		$this->data['entry_debug'] = $this->language->get('entry_debug');
+
+		$this->data['button_save'] = $this->language->get('button_save');
+		$this->data['button_cancel'] = $this->language->get('button_cancel');
+		
+		$this->data['tab_presentation'] = $this->language->get('tab_presentation');
+		$this->data['tab_compte_marchand'] = $this->language->get('tab_compte_marchand');
+		$this->data['tab_description_des_envois'] = $this->language->get('tab_description_des_envois');
+		$this->data['tab_parametres'] = $this->language->get('tab_parametres');
+		$this->data['tab_transporteurs_simples'] = $this->language->get('tab_transporteurs_simples');
+		$this->data['tab_transporteurs_avances'] = $this->language->get('tab_transporteurs_avances');
+		$this->data['tab_simulateur_d_offres'] = $this->language->get('tab_simulateur_d_offres');
+		$this->data['tab_aide'] = $this->language->get('tab_aide');
+		
+
+
+		if (isset($this->error['warning'])) {
+			$this->data['error_warning'] = $this->error['warning'];
+		} else {
+			$this->data['error_warning'] = '';
+		}
+
+		if (isset($this->error['login'])) {
+			$this->data['error_login'] = $this->error['login'];
+		} else {
+			$this->data['error_login'] = '';
+		}
+
+		if (isset($this->error['pass'])) {
+			$this->data['error_pass'] = $this->error['pass'];
+		} else {
+			$this->data['error_pass'] = '';
+		}
+
+		if (isset($this->error['cle'])) {
+			$this->data['error_cle'] = $this->error['cle'];
+		} else {
+			$this->data['error_cle'] = '';
+		}
+		
+		if (isset($this->error['prenom'])) {
+			$this->data['error_prenom'] = $this->error['prenom'];
+		} else {
+			$this->data['error_prenom'] = '';
+		}
+
+		if (isset($this->error['nom'])) {
+			$this->data['error_nom'] = $this->error['nom'];
+		} else {
+			$this->data['error_nom'] = '';
+		}
+
+		
+		if (isset($this->error['adresse'])) {
+			$this->data['error_adresse'] = $this->error['adresse'];
+		} else {
+			$this->data['error_adresse'] = '';
+		}
+
+		if (isset($this->error['codepostal'])) {
+			$this->data['error_codepostal'] = $this->error['codepostal'];
+		} else {
+			$this->data['error_codepostal'] = '';
+		}
+
+		if (isset($this->error['ville'])) {
+			$this->data['error_ville'] = $this->error['ville'];
+		} else {
+			$this->data['error_ville'] = '';
+		}
+		
+		
+		
+		if (isset($this->error['telephone'])) {
+			$this->data['error_telephone'] = $this->error['telephone'];
+		} else {
+			$this->data['error_telephone'] = '';
+		}
+
+		if (isset($this->error['mail'])) {
+			$this->data['error_mail'] = $this->error['mail'];
+		} else {
+			$this->data['error_mail'] = '';
+		}
+		
+		
+		
+
+		
+
+		$this->data['breadcrumbs'] = array();
+
+		$this->data['breadcrumbs'][] = array(
+			'text'      => $this->language->get('text_home'),
+			'href'      => $this->url->link('common/home', 'token=' . $this->session->data['token'], 'SSL'),
+			'separator' => false
+		);
+
+		$this->data['breadcrumbs'][] = array(
+			'text'      => $this->language->get('text_shipping'),
+			'href'      => $this->url->link('extension/shipping', 'token=' . $this->session->data['token'], 'SSL'),
+			'separator' => ' :: '
+		);
+
+		$this->data['breadcrumbs'][] = array(
+			'text'      => $this->language->get('heading_title'),
+			'href'      => $this->url->link('shipping/envoimoinscher', 'token=' . $this->session->data['token'], 'SSL'),
+			'separator' => ' :: '
+		);
+
+		$this->data['action'] = $this->url->link('shipping/envoimoinscher', 'token=' . $this->session->data['token'], 'SSL');
+
+		$this->data['cancel'] = $this->url->link('extension/shipping', 'token=' . $this->session->data['token'], 'SSL');
+
+		if (isset($this->request->post['envoimoinscher_login'])) {
+			$this->data['envoimoinscher_login'] = $this->request->post['envoimoinscher_login'];
+		} else {
+			$this->data['envoimoinscher_login'] = $this->config->get('envoimoinscher_login');
+		}
+
+		if (isset($this->request->post['envoimoinscher_pass'])) {
+			$this->data['envoimoinscher_pass'] = $this->request->post['envoimoinscher_pass'];
+		} else {
+			$this->data['envoimoinscher_pass'] = $this->config->get('envoimoinscher_pass');
+		}
+
+		if (isset($this->request->post['envoimoinscher_cle'])) {
+			$this->data['envoimoinscher_cle'] = $this->request->post['envoimoinscher_cle'];
+		} else {
+			$this->data['envoimoinscher_cle'] = $this->config->get('envoimoinscher_cle');
+		}
+		
+		if (isset($this->request->post['envoimoinscher_environnement'])) {
+			$this->data['envoimoinscher_environnement'] = $this->request->post['envoimoinscher_environnement'];
+		} else {
+			$this->data['envoimoinscher_environnement'] = $this->config->get('envoimoinscher_environnement');
+		}
+
+		$this->data['environnementtenvoimoinscher'] = array();
+
+		$this->data['environnementtenvoimoinscher'][] = array(
+			'value' => 'test',
+			'text'  => $this->language->get('text_test')
+		);
+		$this->data['environnementtenvoimoinscher'][] = array(
+			'value' => 'production',
+			'text'  => $this->language->get('text_prod')
+		);
+		
+		if (isset($this->request->post['envoimoinscher_civilite'])) {
+			$this->data['envoimoinscher_civilite'] = $this->request->post['envoimoinscher_civilite'];
+		} else {
+			$this->data['envoimoinscher_civilite'] = $this->config->get('envoimoinscher_civilite');
+		}
+
+		$this->data['civilenvoimoinscher'] = array();
+
+		$this->data['civilenvoimoinscher'][] = array(
+			'value' => 'M',
+			'text'  => $this->language->get('text_monsieur')
+		);
+
+		$this->data['civilenvoimoinscher'][] = array(
+			'value' => 'Mme',
+			'text'  => $this->language->get('text_madame')
+		);
+
+		$this->data['civilenvoimoinscher'][] = array(
+			'value' => 'Mlle',
+			'text'  => $this->language->get('text_mademoiselle')
+		);
+		
+		if (isset($this->request->post['envoimoinscher_prenom'])) {
+			$this->data['envoimoinscher_prenom'] = $this->request->post['envoimoinscher_prenom'];
+		} else {
+			$this->data['envoimoinscher_prenom'] = $this->config->get('envoimoinscher_prenom');
+		}
+
+		if (isset($this->request->post['envoimoinscher_nom'])) {
+			$this->data['envoimoinscher_nom'] = $this->request->post['envoimoinscher_nom'];
+		} else {
+			$this->data['envoimoinscher_nom'] = $this->config->get('envoimoinscher_nom');
+		}
+		
+		if (isset($this->request->post['envoimoinscher_type'])) {
+			$this->data['envoimoinscher_type'] = $this->request->post['envoimoinscher_type'];
+		} else {
+			$this->data['envoimoinscher_type'] = $this->config->get('envoimoinscher_type');
+		}
+
+		$this->data['typeenvoimoinscher'] = array();
+
+		$this->data['typeenvoimoinscher'][] = array(
+			'value' => 'particulier',
+			'text'  => $this->language->get('text_particulier')
+		);
+		$this->data['typeenvoimoinscher'][] = array(
+			'value' => 'entreprise',
+			'text'  => $this->language->get('text_entreprise')
+		);
+
+		if (isset($this->request->post['envoimoinscher_societe'])) {
+			$this->data['envoimoinscher_societe'] = $this->request->post['envoimoinscher_societe'];
+		} else {
+			$this->data['envoimoinscher_societe'] = $this->config->get('envoimoinscher_societe');
+		}
+		
+		if (isset($this->request->post['envoimoinscher_adresse'])) {
+			$this->data['envoimoinscher_adresse'] = $this->request->post['envoimoinscher_adresse'];
+		} else {
+			$this->data['envoimoinscher_adresse'] = $this->config->get('envoimoinscher_adresse');
+		}
+
+		if (isset($this->request->post['envoimoinscher_codepostal'])) {
+			$this->data['envoimoinscher_codepostal'] = $this->request->post['envoimoinscher_codepostal'];
+		} else {
+			$this->data['envoimoinscher_codepostal'] = $this->config->get('envoimoinscher_codepostal');
+		}
+
+		if (isset($this->request->post['envoimoinscher_ville'])) {
+			$this->data['envoimoinscher_ville'] = $this->request->post['envoimoinscher_ville'];
+		} else {
+			$this->data['envoimoinscher_ville'] = $this->config->get('envoimoinscher_ville');
+		}
+		
+		if (isset($this->request->post['envoimoinscher_emc_pays_id'])) {
+			$this->data['envoimoinscher_emc_pays_id'] = $this->request->post['envoimoinscher_emc_pays_id'];
+		} else {
+			$this->data['envoimoinscher_emc_pays_id'] = $this->config->get('envoimoinscher_emc_pays_id');
+		}
+		
+		$this->load->model('localisation/emc');
+		
+		// Récupération des pays depuis l'API d'EMC
+		$this->data['emc_payss'] = $this->model_localisation_emc->getEmcPaysFromApi();
+		
+		if (isset($this->request->post['envoimoinscher_telephone'])) {
+			$this->data['envoimoinscher_telephone'] = $this->request->post['envoimoinscher_telephone'];
+		} else {
+			$this->data['envoimoinscher_telephone'] = $this->config->get('envoimoinscher_telephone');
+		}
+
+		if (isset($this->request->post['envoimoinscher_mail'])) {
+			$this->data['envoimoinscher_mail'] = $this->request->post['envoimoinscher_mail'];
+		} else {
+			$this->data['envoimoinscher_mail'] = $this->config->get('envoimoinscher_mail');
+		}
+		
+		if (isset($this->request->post['envoimoinscher_supadresse'])) {
+			$this->data['envoimoinscher_supadresse'] = $this->request->post['envoimoinscher_supadresse'];
+		} else {
+			$this->data['envoimoinscher_supadresse'] = $this->config->get('envoimoinscher_supadresse');
+		}
+		
+		if (isset($this->request->post['envoimoinscher_debutdispo'])) {
+			$this->data['envoimoinscher_debutdispo'] = $this->request->post['envoimoinscher_debutdispo'];
+		} else {
+			$this->data['envoimoinscher_debutdispo'] = $this->config->get('envoimoinscher_debutdispo');
+		}
+
+		$this->data['debutdispenvoimoinscher'] = array();
+
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '12:00',
+			'text'  => $this->language->get('text_12:00')
+		);
+
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '12:15',
+			'text'  => $this->language->get('text_12:15')
+		);
+
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '12:30',
+			'text'  => $this->language->get('text_12:30')
+		);
+		
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '12:45',
+			'text'  => $this->language->get('text_12:45')
+		);
+		
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '13:00',
+			'text'  => $this->language->get('text_13:00')
+		);
+
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '13:15',
+			'text'  => $this->language->get('text_13:15')
+		);
+
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '13:30',
+			'text'  => $this->language->get('text_13:30')
+		);
+		
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '13:45',
+			'text'  => $this->language->get('text_13:45')
+		);
+		
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '14:00',
+			'text'  => $this->language->get('text_14:00')
+		);
+
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '14:15',
+			'text'  => $this->language->get('text_14:15')
+		);
+
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '14:30',
+			'text'  => $this->language->get('text_14:30')
+		);
+		
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '14:45',
+			'text'  => $this->language->get('text_14:45')
+		);
+		
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '15:00',
+			'text'  => $this->language->get('text_15:00')
+		);
+
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '15:15',
+			'text'  => $this->language->get('text_15:15')
+		);
+
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '15:30',
+			'text'  => $this->language->get('text_15:30')
+		);
+		
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '15:45',
+			'text'  => $this->language->get('text_15:45')
+		);
+		
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '16:00',
+			'text'  => $this->language->get('text_16:00')
+		);
+
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '16:15',
+			'text'  => $this->language->get('text_16:15')
+		);
+
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '16:30',
+			'text'  => $this->language->get('text_16:30')
+		);
+		
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '16:45',
+			'text'  => $this->language->get('text_16:45')
+		);
+		
+		$this->data['debutdispenvoimoinscher'][] = array(
+			'value' => '17:00',
+			'text'  => $this->language->get('text_17:00')
+		);
+		
+		if (isset($this->request->post['envoimoinscher_findispo'])) {
+			$this->data['envoimoinscher_findispo'] = $this->request->post['envoimoinscher_findispo'];
+		} else {
+			$this->data['envoimoinscher_findispo'] = $this->config->get('envoimoinscher_findispo');
+		}
+
+		$this->data['findispenvoimoinscher'] = array();
+
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '17:00',
+			'text'  => $this->language->get('text_17:00')
+		);
+
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '17:15',
+			'text'  => $this->language->get('text_17:15')
+		);
+
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '17:30',
+			'text'  => $this->language->get('text_17:30')
+		);
+		
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '17:45',
+			'text'  => $this->language->get('text_17:45')
+		);
+		
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '18:00',
+			'text'  => $this->language->get('text_18:00')
+		);
+
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '18:15',
+			'text'  => $this->language->get('text_18:15')
+		);
+
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '18:30',
+			'text'  => $this->language->get('text_18:30')
+		);
+		
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '18:45',
+			'text'  => $this->language->get('text_18:45')
+		);
+		
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '19:00',
+			'text'  => $this->language->get('text_19:00')
+		);
+
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '19:15',
+			'text'  => $this->language->get('text_19:15')
+		);
+
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '19:30',
+			'text'  => $this->language->get('text_19:30')
+		);
+		
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '19:45',
+			'text'  => $this->language->get('text_19:45')
+		);
+		
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '20:00',
+			'text'  => $this->language->get('text_20:00')
+		);
+
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '20:15',
+			'text'  => $this->language->get('text_20:15')
+		);
+
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '20:30',
+			'text'  => $this->language->get('text_20:30')
+		);
+		
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '20:45',
+			'text'  => $this->language->get('text_20:45')
+		);
+		
+		$this->data['findispenvoimoinscher'][] = array(
+			'value' => '21:00',
+			'text'  => $this->language->get('text_21:00')
+		);
+
+		if (isset($this->request->post['envoimoinscher_typeenvoi'])) {
+			$this->data['envoimoinscher_typeenvoi'] = $this->request->post['envoimoinscher_typeenvoi'];
+		} else {
+			$this->data['envoimoinscher_typeenvoi'] = $this->config->get('envoimoinscher_typeenvoi');
+		}
+
+		$this->data['typenvoienvoimoinscher'] = array();
+
+		$this->data['typenvoienvoimoinscher'][] = array(
+			'value' => 'colis',
+			'text'  => $this->language->get('text_colis')
+		);
+
+		$this->data['typenvoienvoimoinscher'][] = array(
+			'value' => 'encombrant',
+			'text'  => $this->language->get('text_encombrant')
+		);
+
+		$this->data['typenvoienvoimoinscher'][] = array(
+			'value' => 'palette',
+			'text'  => $this->language->get('text_palette')
+		);
+		
+		$this->data['typenvoienvoimoinscher'][] = array(
+			'value' => 'pli',
+			'text'  => $this->language->get('text_pli')
+		);
+		
+		
+		
+		if (isset($this->request->post['envoimoinscher_emc_cat_id'])) {
+			$this->data['envoimoinscher_emc_cat_id'] = $this->request->post['envoimoinscher_emc_cat_id'];
+		} else {
+			$this->data['envoimoinscher_emc_cat_id'] = $this->config->get('envoimoinscher_emc_cat_id');
+		}
+
+		// Récupération des catégories et sous catégories depuis l'API d'EMC
+		$this->data['emc_cates'] = $this->model_localisation_emc->getEmcCategoriesFromApi();
+		
+		
+		
+		if (isset($this->request->post['envoimoinscher_typeemballage'])) {
+			$this->data['envoimoinscher_typeemballage'] = $this->request->post['envoimoinscher_typeemballage'];
+		} else {
+			$this->data['envoimoinscher_typeemballage'] = $this->config->get('envoimoinscher_typeemballage');
+		}
+
+		$this->data['typemballageenvoimoinscher'] = array();
+
+		$this->data['typemballageenvoimoinscher'][] = array(
+			'value' => '1-Boite',
+			'text'  => $this->language->get('text_boite')
+		);
+		$this->data['typemballageenvoimoinscher'][] = array(
+			'value' => '17-Tube',
+			'text'  => $this->language->get('text_tube')
+		);
+		
+		if (isset($this->request->post['envoimoinscher_enlevement'])) {
+			$this->data['envoimoinscher_enlevement'] = $this->request->post['envoimoinscher_enlevement'];
+		} else {
+			$this->data['envoimoinscher_enlevement'] = $this->config->get('envoimoinscher_enlevement');
+		}
+
+		$this->data['enlevementtenvoimoinscher'] = array();
+
+		$this->data['enlevementtenvoimoinscher'][] = array(
+			'value' => '1',
+			'text'  => $this->language->get('text_J+1')
+		);
+		$this->data['enlevementtenvoimoinscher'][] = array(
+			'value' => '2',
+			'text'  => $this->language->get('text_J+2')
+		);
+		$this->data['enlevementtenvoimoinscher'][] = array(
+			'value' => '3',
+			'text'  => $this->language->get('text_J+3')
+		);
+		$this->data['enlevementtenvoimoinscher'][] = array(
+			'value' => '4',
+			'text'  => $this->language->get('text_J+4')
+		);
+		$this->data['enlevementtenvoimoinscher'][] = array(
+			'value' => '5',
+			'text'  => $this->language->get('text_J+5')
+		);
+		$this->data['enlevementtenvoimoinscher'][] = array(
+			'value' => '6',
+			'text'  => $this->language->get('text_J+6')
+		);
+		$this->data['enlevementtenvoimoinscher'][] = array(
+			'value' => '7',
+			'text'  => $this->language->get('text_J+7')
+		);
+
+        if (isset($this->request->post['envoimoinscher_weight_class_id'])) {
+			$this->data['envoimoinscher_weight_class_id'] = $this->request->post['envoimoinscher_weight_class_id'];
+		} else {
+			$this->data['envoimoinscher_weight_class_id'] = $this->config->get('envoimoinscher_weight_class_id');
+		}
+
+		$this->load->model('localisation/weight_class');
+
+		$this->data['weight_classes'] = $this->model_localisation_weight_class->getWeightClasses();
+
+		if (isset($this->request->post['envoimoinscher_length_code'])) {
+			$this->data['envoimoinscher_length_code'] = $this->request->post['envoimoinscher_length_code'];
+		} else {
+			$this->data['envoimoinscher_length_code'] = $this->config->get('envoimoinscher_length_code');
+		}
+
+		if (isset($this->request->post['envoimoinscher_length_class_id'])) {
+			$this->data['envoimoinscher_length_class_id'] = $this->request->post['envoimoinscher_length_class_id'];
+		} else {
+			$this->data['envoimoinscher_length_class_id'] = $this->config->get('envoimoinscher_length_class_id');
+		}
+
+		$this->load->model('localisation/length_class');
+
+		$this->data['length_classes'] = $this->model_localisation_length_class->getLengthClasses();
+
+		if (isset($this->request->post['envoimoinscher_length'])) {
+			$this->data['envoimoinscher_length'] = $this->request->post['envoimoinscher_length'];
+		} else {
+			$this->data['envoimoinscher_length'] = $this->config->get('envoimoinscher_length');
+		}
+
+		if (isset($this->request->post['envoimoinscher_width'])) {
+			$this->data['envoimoinscher_width'] = $this->request->post['envoimoinscher_width'];
+		} else {
+			$this->data['envoimoinscher_width'] = $this->config->get('envoimoinscher_width');
+		}		
+
+		if (isset($this->request->post['envoimoinscher_height'])) {
+			$this->data['envoimoinscher_height'] = $this->request->post['envoimoinscher_height'];
+		} else {
+			$this->data['envoimoinscher_height'] = $this->config->get('envoimoinscher_height');
+		}
+
+        if (isset($this->error['dimension'])) {
+            $this->data['error_dimension'] = $this->error['dimension'];
+        } else {
+            $this->data['error_dimension'] = '';
+        }
+
+		if (isset($this->request->post['envoimoinscher_tax_class_id'])) {
+			$this->data['envoimoinscher_tax_class_id'] = $this->request->post['envoimoinscher_tax_class_id'];
+		} else {
+			$this->data['envoimoinscher_tax_class_id'] = $this->config->get('envoimoinscher_tax_class_id');
+		}
+
+		$this->load->model('localisation/tax_class');
+
+		$this->data['tax_classes'] = $this->model_localisation_tax_class->getTaxClasses();
+
+		if (isset($this->request->post['envoimoinscher_geo_zone_id'])) {
+			$this->data['envoimoinscher_geo_zone_id'] = $this->request->post['envoimoinscher_geo_zone_id'];
+		} else {
+			$this->data['envoimoinscher_geo_zone_id'] = $this->config->get('envoimoinscher_geo_zone_id');
+		}
+
+		$this->load->model('localisation/geo_zone');
+
+		$this->data['geo_zones'] = $this->model_localisation_geo_zone->getGeoZones();
+
+		if (isset($this->request->post['envoimoinscher_status'])) {
+			$this->data['envoimoinscher_status'] = $this->request->post['envoimoinscher_status'];
+		} else {
+			$this->data['envoimoinscher_status'] = $this->config->get('envoimoinscher_status');
+		}
+
+		if (isset($this->request->post['envoimoinscher_sort_order'])) {
+			$this->data['envoimoinscher_sort_order'] = $this->request->post['envoimoinscher_sort_order'];
+		} else {
+			$this->data['envoimoinscher_sort_order'] = $this->config->get('envoimoinscher_sort_order');
+		}
+
+		if (isset($this->request->post['envoimoinscher_debug'])) {
+			$this->data['envoimoinscher_debug'] = $this->request->post['envoimoinscher_debug'];
+		} else {
+			$this->data['envoimoinscher_debug'] = $this->config->get('envoimoinscher_debug');
+		}
+
+		$this->template = 'shipping/envoimoinscher.tpl';
+		$this->children = array(
+			'common/header',
+			'common/footer'
+		);
+
+		$this->response->setOutput($this->render());
+	}
+
+	protected function validate() {
+		if (!$this->user->hasPermission('modify', 'shipping/envoimoinscher')) {
+			$this->error['warning'] = $this->language->get('error_permission');
+		}
+
+		if (!$this->request->post['envoimoinscher_login']) {
+			$this->error['login'] = $this->language->get('error_login');
+		}
+
+		if (!$this->request->post['envoimoinscher_pass']) {
+			$this->error['pass'] = $this->language->get('error_pass');
+		}
+
+		if (!$this->request->post['envoimoinscher_cle']) {
+			$this->error['cle'] = $this->language->get('error_cle');
+		}
+		
+		if (!$this->request->post['envoimoinscher_ville']) {
+			$this->error['ville'] = $this->language->get('error_ville');
+		}
+		
+		if (!$this->request->post['envoimoinscher_codepostal']) {
+			$this->error['codepostal'] = $this->language->get('error_codepostal');
+		}
+
+        if (empty($this->request->post['envoimoinscher_length'])) {
+            $this->error['dimension'] = $this->language->get('error_dimension');
+        }
+
+        if (empty($this->request->post['envoimoinscher_width'])) {
+            $this->error['dimension'] = $this->language->get('error_dimension');
+        }
+
+        if (empty($this->request->post['envoimoinscher_height'])) {
+            $this->error['dimension'] = $this->language->get('error_dimension');
+        }
+		
+
+		if (!$this->error) {
+			return true;
+		} else {
+			return false;
+		}	
+	}
+}
+?>
