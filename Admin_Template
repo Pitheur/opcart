@@ -32,18 +32,7 @@
                 <?php echo $text_no; ?>
                 <?php } ?></td>
             </tr>
-              <tr>
-                  <td><?php echo $entry_carriers_list; var_dump($envoimoinscher_carrier_id); ?></td>
-                  <div class="scrollbox">
-                      <?php $i=0; ?>
-                      <?php foreach ($emc_carriers as $carrier) { ?>
-                      <?php if($envoimoinscher_carrier_id[$i]==$carrier['srv_name']) { ?>
-                      <input type="checkbox"  name="envoimoinscher_carrier_id[]" value="<?php echo $carrier['srv_name']; ?>" checked="checked" /><?php echo $carrier['srv_name']?><br/>
-                      <?php if($i<count($envoimoinscher_carrier_id)-1)$i++;} else { ?>
-                  <input type="checkbox" name="envoimoinscher_carrier_id[]" value="<?php echo $carrier['srv_name']; ?>" /><?php echo $carrier['srv_name']?><br/>
-                  <?php } }?>
-                  </div>
-              </tr>
+
             <tr>
               <td><?php echo $entry_weight_class; ?></td>
               <td><select name="royal_mail_weight_class_id">
@@ -378,6 +367,18 @@
         </div>
         <div id="tab-transporteurs-simples" class="vtabs-content">
           <table class="form">
+              <tr>
+                  <td><?php echo $entry_carriers_list; var_dump($envoimoinscher_carrier_id); ?></td>
+                  <div class="scrollbox">
+                      <?php $i=0; ?>
+                      <?php foreach ($emc_carriers as $carrier) { ?>
+                      <?php if($envoimoinscher_carrier_id[$i]==$carrier['srv_name']) { ?>
+                      <input type="checkbox"  name="envoimoinscher_carrier_id[]" value="<?php echo $carrier['srv_name']; ?>" checked="checked" /><?php echo $carrier['srv_name']?><br/>
+                      <?php if($i<count($envoimoinscher_carrier_id)-1)$i++;} else { ?>
+                      <input type="checkbox" name="envoimoinscher_carrier_id[]" value="<?php echo $carrier['srv_name']; ?>" /><?php echo $carrier['srv_name']?><br/>
+                      <?php } }?>
+                  </div>
+              </tr>
             <tr>
               <td><?php echo $entry_rate; ?></td>
               <td><textarea name="royal_mail_2nd_class_recorded_rate" cols="40" rows="5"><?php echo $royal_mail_2nd_class_recorded_rate; ?></textarea></td>
